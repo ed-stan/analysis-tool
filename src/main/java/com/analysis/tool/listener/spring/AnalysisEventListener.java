@@ -5,7 +5,6 @@ import com.alibaba.fastjson2.JSONObject;
 import com.analysis.tool.common.event.AnalysisEvent;
 import com.analysis.tool.entity.dto.StepDTO;
 import com.analysis.tool.plugin.AbstractPlugin;
-import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author DingYulong
@@ -44,41 +44,53 @@ public class AnalysisEventListener implements ApplicationListener<AnalysisEvent>
 
     @Override
     public void onApplicationEvent(AnalysisEvent event) {
-        System.out.println("Received event: " + event.getParam());
         //读取执行规则
-
-        //
         JSONArray jsonArray = JSONArray.parseArray(step);
         Map<String, Object> runtimeParam = new HashMap<>();
+
+        for (String s : param.split(",")) {
+            runtimeParam.put(s, event.getParam().getOrDefault(s,""));
+        }
+
         for (int i = 0; i < jsonArray.size(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
-
             StepDTO stepDTO = JSONObject.parseObject(jsonObject.toJSONString(), StepDTO.class);
-
             String type = jsonObject.getString("type");
+
+            Map<String, Object> nodeParam = stepDTO.getNodeParam();
+            List<Map<String, Object>> taskParam = stepDTO.getTaskParam();
+
+
             if ("bean".equals(type)){
                 //执行插件
-                Map<String, Object> nodeParam = stepDTO.getNodeParam();
                 String pluginName = String.valueOf(nodeParam.get("name"));
-
                 AbstractPlugin abstractPlugin = (AbstractPlugin)context.getBean(pluginName);
-                Map<String, Object> execute = abstractPlugin.execute(stepDTO.getTaskParam());
+                Map<String, Object> taskParamMap = new HashMap<>();
+                taskParam.forEach(node->{
+                    String name = String.valueOf(node.get("name"));
+                    String value = String.valueOf(node.get("value"));
+                    taskParamMap.put(name, runtimeParam.get(value));
+                });
+                Map<String, Object> execute = abstractPlugin.execute(taskParamMap);
                 runtimeParam.putAll(execute);
-
-
             } else if ("script".equals(type)) {
+                //将 taskParam 的value先转为list再将所有元素用 分割后得到字符串
+
+                String param = taskParam.stream().map(node -> String.valueOf(runtimeParam.get(String.valueOf(node.get("value"))))).collect(Collectors.joining(" "));
+
                 //执行脚本
-                Map<String, Object> nodeParam = stepDTO.getNodeParam();
                 String url = String.valueOf(nodeParam.get("url"));
                 String path = String.valueOf(nodeParam.get("path"));
                 String token = String.valueOf(nodeParam.get("token"));
-
                 url=String.format(url,token);
                 String downloadCommand = "git clone "+url +" "+ scriptPath;
                 executeShellCommand(downloadCommand);
-                String executeCommand = "sh "+scriptPath+path;
-                List<String> strings = executeShellCommand(executeCommand);
-                log.info(strings.toString());
+                String executeCommand = "sh "+scriptPath+path + " " + param;
+                List<String> results = executeShellCommand(executeCommand);
+                log.info(results.toString());
+
+                Map<String, Object> outputParam = stepDTO.getOutputParam();
+                outputParam.forEach((k, v)-> runtimeParam.put( k,results.get(Integer.parseInt( String.valueOf(v)))));
                 String deleteCommand = "rm -rf "+scriptPath;
                 executeShellCommand(deleteCommand);
             }else {
@@ -88,6 +100,7 @@ public class AnalysisEventListener implements ApplicationListener<AnalysisEvent>
         }
 
 
+       log.info(String.valueOf(runtimeParam));
     }
 
 

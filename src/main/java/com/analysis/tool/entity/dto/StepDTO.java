@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,5 +21,7 @@ public class StepDTO implements Serializable {
 
     private Map<String,Object> nodeParam;
 
-    private Map<String,Object> taskParam;
+    private List<Map<String,Object>> taskParam;
+
+    private Map<String,Object>  outputParam;
 }
