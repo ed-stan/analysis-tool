@@ -19,9 +19,9 @@ public class StepDTO implements Serializable {
 
     private String type;
 
-    private Map<String,Object> nodeParam;
+    private Map<String, Object> nodeParam;
 
-    private List<Map<String,Object>> taskParam;
+    private List<Map<String, Object>> taskParam;
 
-    private Map<String,Object>  outputParam;
+    private Map<String, Object> outputParam;
 }

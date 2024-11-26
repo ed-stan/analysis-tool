@@ -15,9 +15,9 @@ import java.util.Map;
  */
 @Component("demoPlugin")
 @Slf4j
-public class DemoPlugin implements AbstractPlugin{
+public class DemoPlugin implements AbstractPlugin {
     @Override
-    public Map<String, Object>  execute(Map<String, Object> params) {
+    public Map<String, Object> execute(Map<String, Object> params) {
         Map<String, Object> result = new HashMap<>();
         result.put("params", JSONObject.toJSONString(params));
         result.put("event", "demoPlugin");

@@ -11,5 +11,5 @@ import java.util.Objects;
  */
 @Component
 public interface AbstractPlugin {
-    Map<String, Object>  execute(Map<String, Object> params);
+    Map<String, Object> execute(Map<String, Object> params);
 }

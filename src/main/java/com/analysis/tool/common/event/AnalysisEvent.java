@@ -10,7 +10,7 @@ import java.util.Objects;
  * @author DingYulong
  * @Date 2024/11/14 15:22
  */
-public class AnalysisEvent  extends ApplicationEvent {
+public class AnalysisEvent extends ApplicationEvent {
     private final Map<String, Object> param;
 
     public AnalysisEvent(Object source, Map<String, Object> params) {
@@ -19,6 +19,6 @@ public class AnalysisEvent  extends ApplicationEvent {
     }
 
     public Map<String, Object> getParam() {
-        return Objects.isNull(param)? new HashMap<>() : param;
+        return Objects.isNull(param) ? new HashMap<>() : param;
     }
 }

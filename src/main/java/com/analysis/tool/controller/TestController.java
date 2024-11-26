@@ -22,9 +22,8 @@ public class TestController {
 
     @RequestMapping("/execute")
     public String execute(@RequestBody Map<String, Object> params){
-
         System.out.println(params);
         eventPublisherService.publishEvent(new AnalysisEvent(this, params));
-        return "hello world";
+        return "task execute";
     }
 }

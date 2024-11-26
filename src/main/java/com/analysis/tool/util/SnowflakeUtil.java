@@ -77,8 +77,8 @@ public class SnowflakeUtil {
         return System.currentTimeMillis();
     }
 
-    public static long getId(){
-        SnowflakeUtil snowflake = new SnowflakeUtil(1,1);
+    public static long getId() {
+        SnowflakeUtil snowflake = new SnowflakeUtil(1, 1);
         return snowflake.nextId();
     }
 }
