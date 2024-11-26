@@ -23,7 +23,7 @@ time,location,person #入参变量名
 ```json
 [
     {
-    		#执行类型，插件执行或者脚本执行
+        #执行类型，插件执行或者脚本执行
         "type": "bean", 
         #若为插件执行，提供插件名
         "nodeParam": {
@@ -32,7 +32,7 @@ time,location,person #入参变量名
         #任务执行参数
         "taskParam": [
             {
-  							#参数名是根据插件逻辑设置，不可随意更改
+                #参数名是根据插件逻辑设置，不可随意更改
                 "name": "timeParam",
                 #该value为引用
                 "value": "time",
@@ -56,7 +56,7 @@ time,location,person #入参变量名
         "type": "script",
         #若为脚本执行，提供git仓库地址、路径和token
         "nodeParam": {
-        		#脚本类型
+            #脚本类型
             "scriptType": "shell",
             "url": "https://%s@gitee.com/edstan/analysis-tool-script.git",
             "path": "/shell/demo.sh",
