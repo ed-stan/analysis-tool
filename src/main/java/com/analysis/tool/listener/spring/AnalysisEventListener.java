@@ -109,6 +109,7 @@ public class AnalysisEventListener implements ApplicationListener<AnalysisEvent>
             taskParamMap.put(name, runtimeParam.get(value));
         });
         Map<String, Object> execute = abstractPlugin.execute(taskParamMap);
+        //TODO 配置输出参数
         runtimeParam.putAll(execute);
     }
 
