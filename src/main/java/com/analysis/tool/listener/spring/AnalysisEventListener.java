@@ -5,12 +5,16 @@ import com.alibaba.fastjson2.JSONObject;
 import com.analysis.tool.common.event.AnalysisEvent;
 import com.analysis.tool.entity.dto.StepDTO;
 import com.analysis.tool.plugin.AbstractPlugin;
+import com.analysis.tool.util.ThreadIdGeneratorUtil;
+import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.NonNullApi;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -38,15 +42,16 @@ public class AnalysisEventListener implements ApplicationListener<AnalysisEvent>
     @Value("${analysis.tool.script.path}")
     private String scriptPath;
 
-    @Autowired
+    @Resource
     private ApplicationContext context;
 
 
     @Override
-    public void onApplicationEvent(AnalysisEvent event) {
+    public void onApplicationEvent(@NonNull AnalysisEvent event) {
         //读取执行规则
         JSONArray jsonArray = JSONArray.parseArray(step);
         Map<String, Object> runtimeParam = new HashMap<>();
+        log.info("taskId is:{}", ThreadIdGeneratorUtil.getThreadId());
 
         for (String s : param.split(",")) {
             runtimeParam.put(s, event.getParam().getOrDefault(s,""));
@@ -124,10 +129,6 @@ public class AnalysisEventListener implements ApplicationListener<AnalysisEvent>
             while ((line = reader.readLine()) != null) {
                 outputLines.add(line);
             }
-            // 读取命令的错误输出
-            while ((line = errorReader.readLine()) != null) {
-                log.error(line);
-            }
             // 等待命令执行完成
             process.waitFor();
             // 关闭输入流
@@ -135,6 +136,7 @@ public class AnalysisEventListener implements ApplicationListener<AnalysisEvent>
             errorReader.close();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
+            log.error("Error executing shell command: {}", e.getMessage());
         }
 
         return outputLines;
